@@ -11,15 +11,8 @@
           <span class="select-tags" closable v-for="(type, index) of scope.row.typeData" :key="index">{{ type }}</span>
         </div>
         <div v-if="activeEditIndex.includes(scope.$index)">
-          <treeselect 
-            :multiple="true" 
-            :options="scope.row.treeData" 
-            :default-expand-level="1" 
-            :flat="true" 
-            zIndex="9999"
-            placeholder="请输入" 
-            v-model="scope.row.typeData" 
-            :append-to-body="true" />
+          <treeselect :multiple="true" :options="scope.row.treeData" :default-expand-level="1" :flat="true"
+            zIndex="9999" placeholder="请输入" v-model="scope.row.typeData" :append-to-body="true" />
         </div>
       </template>
     </el-table-column>
@@ -45,6 +38,9 @@ export default {
       tableData: [{
         order: '1',
         typeData: ['一级 1', '二级 1-1'],
+      }, {
+        order: '1',
+        typeData: ['二级 1-1'],
       }],
       treeData: [{
         pbiId: 1,
@@ -92,14 +88,20 @@ export default {
       this.activeEditIndex = this.activeEditIndex.filter(item => item !== index);
     },
     deepSelectData(treeData) {
-      if (!treeData || !treeData.length) return [];
+      if (!treeData || !treeData.length) return;
       let data = [];
       treeData.forEach(item => {
-        data.push({
-          id: item.cn,
-          label: item.cn,
-          children: item.children ? this.deepSelectData(item.children) : []
-        })
+        item.children && item.children.length
+          ? data.push({
+            id: item.cn,
+            label: item.cn,
+            children: this.deepSelectData(item.children)
+          })
+          : data.push({
+            id: item.cn,
+            label: item.cn,
+          })
+
       })
       return data;
     },
